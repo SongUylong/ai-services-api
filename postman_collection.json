@@ -1,0 +1,1277 @@
+{
+  "info": {
+    "name": "Laravel Auth API - User & Admin Routes",
+    "_postman_id": "00000000-0000-0000-0000-000000000000",
+    "description": "Complete API collection with User self-management and Admin routes\n\nRole & Permission System:\n- Uses Spatie Laravel-Permission package\n- Guard: 'api' (for Laravel Passport)\n- Available Roles: 'admin', 'user'\n- Role assignment uses role names, not IDs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public - Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone_number\": \"+855123456789\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            },
+            "description": "Register a new user. Automatically assigns 'user' role with basic permissions (profile, credentials, settings management)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.access_token) {",
+                  "    pm.collectionVariables.set('access_token', json.data.access_token);",
+                  "  }",
+                  "  if (json.data.refresh_token) {",
+                  "    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username_or_email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"remember_me\": true\n}"
+            },
+            "description": "Login with email or username. You can use either email (john.doe@example.com) or username (johndoe) in the username_or_email field."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.access_token) {",
+                  "    pm.collectionVariables.set('access_token', json.data.access_token);",
+                  "  }",
+                  "  if (json.data.refresh_token) {",
+                  "    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["refresh-token"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\",\n  \"remember_me\": true\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.access_token) {",
+                  "    pm.collectionVariables.set('access_token', json.data.access_token);",
+                  "  }",
+                  "  if (json.data.refresh_token) {",
+                  "    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Models",
+      "item": [
+        {
+          "name": "List AI Models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ai-models",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai-models"]
+            },
+            "description": "List all available AI models (e.g., GPT-4, GPT-3.5, Claude). Use the model IDs when sending messages in conversations."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User - Profile Management",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe Updated\",\n  \"email\": \"john.doe@example.com\",\n  \"phone_number\": \"+855123456789\"\n}"
+            },
+            "description": "Update your own profile. Use your CURRENT email/phone if you don't want to change them, or NEW unique values if you do."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload My Profile Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/me/profile-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me", "profile-image"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select an image file (JPEG, PNG, JPG, GIF - Max 2MB)"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User - Authentication",
+      "item": [
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout All Devices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/logout-all-devices",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "logout-all-devices"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User - Settings",
+      "item": [
+        {
+          "name": "Get My Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/me/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me", "settings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/me/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "me", "settings"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"theme\": \"dark\",\n  \"language\": \"en\",\n  \"preferred_ai_model_id\": 1\n}"
+            },
+            "description": "Update your own settings. Allowed fields: theme (light|dark), language (en|kh), preferred_ai_model_id (integer, AI model ID). At least one field is required. Set preferred_ai_model_id to use that AI model by default when sending messages without specifying an AI model."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User - Credentials",
+      "item": [
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "password"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"{{password}}\",\n  \"password\": \"newpassword123\",\n  \"password_confirmation\": \"newpassword123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Username",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/username",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "username"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newusername\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"phone_number\": \"+855111222333\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith Updated\",\n  \"email\": \"jane.smith@example.com\",\n  \"phone_number\": \"+855111222333\"\n}"
+            },
+            "description": "Update a user (admin only). Use the user's CURRENT email/phone if not changing them, or NEW unique values if updating."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload User Profile Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/profile-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "profile-image"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select an image file (JPEG, PNG, JPG, GIF - Max 2MB)"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - User Roles",
+      "item": [
+        {
+          "name": "Get User Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "roles"]
+            },
+            "description": "Get user's assigned roles and available roles. Response includes user data, current roles, and all available roles in the system."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "roles"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "description": "Available roles: 'admin' or 'user'"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Role from User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/roles/{{role_name}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "roles", "{{role_name}}"]
+            },
+            "description": "Remove a role from a user. Use role name ('admin' or 'user'), not ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - User Status",
+      "item": [
+        {
+          "name": "Toggle User Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/toggle-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "toggle-status"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": false\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - User Credentials",
+      "item": [
+        {
+          "name": "Change User Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "password"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"newpassword123\",\n  \"password_confirmation\": \"newpassword123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Username",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{user_id}}/username",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{user_id}}", "username"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newusername\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "item": [
+        {
+          "name": "List My Conversations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations?per_page=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Number of items per page (1-100, default: 15)"
+                },
+                {
+                  "key": "filter[title]",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter: Search by conversation title (partial match, case-insensitive)"
+                },
+                {
+                  "key": "sort",
+                  "value": "created_at",
+                  "disabled": true,
+                  "description": "Sort: created_at (oldest first)"
+                },
+                {
+                  "key": "sort",
+                  "value": "-created_at",
+                  "disabled": true,
+                  "description": "Sort: -created_at (newest first)"
+                },
+                {
+                  "key": "sort",
+                  "value": "updated_at",
+                  "disabled": true,
+                  "description": "Sort: updated_at (least recently updated first)"
+                },
+                {
+                  "key": "sort",
+                  "value": "-updated_at",
+                  "disabled": true,
+                  "description": "Sort: -updated_at (most recently updated first) [DEFAULT]"
+                }
+              ]
+            },
+            "description": "List all conversations for the authenticated user with pagination, filtering, and sorting.\n\n**Pagination:**\n- per_page: 1-100 (default: 15)\n- Use pagination links from response (next_page_url) for infinite scrolling\n\n**Filtering:**\n- filter[title]: Search conversations by title (partial match, case-insensitive)\n  Example: ?filter[title]=Laravel\n\n**Sorting:**\n- created_at: Sort by creation date (oldest first)\n- -created_at: Sort by creation date (newest first)\n- updated_at: Sort by last update (least recent first)\n- -updated_at: Sort by last update (most recent first) [DEFAULT]\n  Example: ?sort=-updated_at\n\n**Combine Parameters:**\nExample: ?per_page=20&filter[title]=project&sort=-created_at\n\n**Note:** Users can only see their own conversations."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data && json.data.length > 0) {",
+                  "  pm.collectionVariables.set('conversation_id', json.data[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Get Conversation Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/{{conversation_id}}?per_page=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "{{conversation_id}}"],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "20",
+                  "description": "Number of messages per page (1-100, default: 20)"
+                }
+              ]
+            },
+            "description": "Get a specific conversation with paginated messages. Messages are ordered from oldest to newest, with user messages appearing before bot responses.\n\n**Pagination:**\n- per_page: 1-100 (default: 20)\n- Messages are returned in ascending order by creation time\n- User messages appear before bot responses when timestamps are close\n- The response includes 'total_messages' field showing the total count of messages in the conversation\n\n**Response includes:**\n- Conversation details (id, title, timestamps)\n- messages: Array of message objects (limited by per_page)\n- total_messages: Total count of all messages in the conversation\n\n**Bot Message Version Tracking:**\nBot messages include all versions in a versions array:\n- `versions`: Array of all versions with version_index and content\n- Content shows the latest regenerated version\n- Total version index is `versions.length - 1`\n\n**Example Messages:**\n\nUser Message:\n```json\n{\n  \"id\": 100,\n  \"sender\": \"user\",\n  \"content\": \"What is Laravel?\",\n  \"ai_model_id\": 1,\n  \"status\": \"completed\",\n  \"attachments\": [],\n  \"ai_model\": { \"id\": 1, \"name\": \"GPT-4\" }\n}\n```\n\nBot Message with Versions:\n```json\n{\n  \"id\": 107,\n  \"sender\": \"bot\",\n  \"content\": \"Laravel is a PHP framework... (Version 7)\",\n  \"parent_message_id\": 100,\n  \"versions\": [\n    { \"version_index\": 0, \"content\": \"Laravel is... (Version 1)\" },\n    { \"version_index\": 1, \"content\": \"Laravel is... (Version 2)\" },\n    { \"version_index\": 2, \"content\": \"Laravel is... (Version 3)\" },\n    { \"version_index\": 3, \"content\": \"Laravel is... (Version 4)\" },\n    { \"version_index\": 4, \"content\": \"Laravel is... (Version 5)\" },\n    { \"version_index\": 5, \"content\": \"Laravel is... (Version 6)\" },\n    { \"version_index\": 6, \"content\": \"Laravel is... (Version 7)\" }\n  ],\n  \"ai_model_id\": 1,\n  \"status\": \"completed\",\n  \"attachments\": [],\n  \"feedback\": null,\n  \"ai_model\": { \"id\": 1, \"name\": \"GPT-4\" }\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Conversation (Rename)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/{{conversation_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "{{conversation_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Conversation Title\"\n}"
+            },
+            "description": "Update conversation title. Users can only update their own conversations."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Conversation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/{{conversation_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "{{conversation_id}}"]
+            },
+            "description": "Soft delete a conversation. Users can only delete their own conversations."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Message & Create New Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversation/new-message",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversation", "new-message"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"What is Laravel?\"\n}"
+            },
+            "description": "Send a message and automatically create a new conversation. The AI model will be selected from your user preference settings. If you don't have a preferred AI model set, you must include 'ai_model_id' in the request.\n\n**Request Body:**\n- content (required): The message text\n- ai_model_id (optional): Override your preferred AI model for this message\n\n**Response includes:**\n- conversation_id: The newly created conversation ID\n- title: The conversation title (currently mock data)\n- user_message: Your message details\n- bot_message: The AI response\n\n**Note:** Set your preferred AI model in Settings (PUT /user/me/settings with preferred_ai_model_id) to avoid specifying it in every message request."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.conversation_id) {",
+                  "    pm.collectionVariables.set('conversation_id', json.data.conversation_id);",
+                  "  }",
+                  "  if (json.data.bot_message && json.data.bot_message.id) {",
+                  "    pm.collectionVariables.set('message_id', json.data.bot_message.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Message (Text Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/{{conversation_id}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "{{conversation_id}}", "messages"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"What is Laravel?\"\n}"
+            },
+            "description": "Send a text message in an existing conversation. The AI model will be selected from your user preference settings. You can optionally specify ai_model_id to override your preference for this message.\n\n**Request Body:**\n- content (required): The message text\n- ai_model_id (optional): Override your preferred AI model (1=GPT-4, 2=GPT-3.5, 3=Claude)\n\n**Response Structure:**\nThe API returns both messages with their full details:\n```json\n{\n  \"data\": {\n    \"user_message\": { \"id\": 100, \"sender\": \"user\", \"content\": \"What is Laravel?\", ... },\n    \"bot_message\": {\n      \"id\": 101,\n      \"sender\": \"bot\",\n      \"content\": \"Laravel is a PHP framework...\",\n      \"parent_message_id\": 100,\n      \"current_version_index\": 0,\n      \"ai_model\": { \"id\": 1, \"name\": \"GPT-4\" },\n      ...\n    }\n  }\n}\n```\n\n**Note:** This is the same endpoint for messages with or without attachments. Use formdata mode (see next request) when including files."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.bot_message && json.data.bot_message.id) {",
+                  "    pm.collectionVariables.set('message_id', json.data.bot_message.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Message with Attachments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/{{conversation_id}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", "{{conversation_id}}", "messages"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "value": "Please review these files",
+                  "type": "text"
+                },
+
+                {
+                  "key": "attachments[]",
+                  "type": "file",
+                  "src": [],
+                  "description": "First file (optional)"
+                },
+                {
+                  "key": "attachments[]",
+                  "type": "file",
+                  "src": [],
+                  "description": "Second file (optional)"
+                }
+              ]
+            },
+            "description": "Send a message with optional file attachments (same endpoint as text-only messages). The AI model will be selected from your user preference settings.\n\n**Request:**\n- content (required): The message text\n- ai_model_id (optional): Override your preferred AI model\n- attachments[] (optional): Up to 5 files\n\n**Attachments:**\n- Optional: You can send 0 to 5 files\n- Max 5 files per message\n- Max file size configured in server (default: 10MB per file)\n- Frontend handles file preview/removal before sending\n- Once sent, attachments are permanent with the message\n\n**Implementation Notes:**\n- Use multipart/form-data when including files\n- Use application/json when sending text only\n- Backend validates and stores attachments automatically\n- No separate endpoint needed for attachment management\n- If you have a preferred AI model set in your settings, you don't need to include ai_model_id\n\n**TODO:** AI service integration for processing attachments will be implemented later."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.data) {",
+                  "  if (json.data.bot_message && json.data.bot_message.id) {",
+                  "    pm.collectionVariables.set('message_id', json.data.bot_message.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Regenerate Bot Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/messages/{{message_id}}/regenerate",
+              "host": ["{{baseUrl}}"],
+              "path": ["messages", "{{message_id}}", "regenerate"]
+            },
+            "description": "Regenerate a bot response. Only works for bot messages. The old message is kept and a new response is generated with an incremented regeneration_index.\n\n**Regeneration Tracking:**\n- Original message: regeneration_index = 0\n- First regeneration: regeneration_index = 1\n- Second regeneration: regeneration_index = 2\n- And so on...\n\n**Response Structure:**\nReturns the newly generated message:\n```json\n{\n  \"data\": {\n    \"id\": 103,\n    \"sender\": \"bot\",\n    \"content\": \"Hello! (Version 2)\",\n    \"parent_message_id\": 100,\n    \"versions\": [\n      { \"version_index\": 0, \"content\": \"Hi! (Version 1)\" },\n      { \"version_index\": 1, \"content\": \"Hello! (Version 2)\" }\n    ],\n    \"feedback\": null,\n    \"ai_model\": { \"id\": 1, \"name\": \"GPT-4\" },\n    ...\n  }\n}\n```\n\n**Benefits:**\n- All versions are preserved in the database\n- All versions are returned in the response within the versions array\n- When you GET conversation details, all bot messages include their full version history\n- Feedback is shared across all versions (stored on original message)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Message Feedback",
+      "item": [
+        {
+          "name": "Like Message",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/messages/{{message_id}}/feedback",
+              "host": ["{{baseUrl}}"],
+              "path": ["messages", "{{message_id}}", "feedback"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback_type\": \"like\"\n}"
+            },
+            "description": "Give positive feedback (like) to a bot message. Can only be done on bot messages in your own conversations.\n\n**Important:** Feedback is shared across all regenerations of the same response. If you give feedback to any regenerated version, it applies to the original message and all its regenerations will show the same feedback.\n\n**How it works:**\n1. Feedback is always stored on the original message (regeneration_index = 0)\n2. When viewing any regenerated version, it displays the original message's feedback\n3. All versions show the same feedback in their response\n4. The versions array remains unchanged - only the feedback field is updated"
+          },
+          "response": []
+        },
+        {
+          "name": "Dislike Message",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/messages/{{message_id}}/feedback",
+              "host": ["{{baseUrl}}"],
+              "path": ["messages", "{{message_id}}", "feedback"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback_type\": \"dislike\"\n}"
+            },
+            "description": "Give negative feedback (dislike) to a bot message. Can only be done on bot messages in your own conversations.\n\n**Important:** Feedback is shared across all regenerations of the same response. If you give feedback to any regenerated version, it applies to the original message and all its regenerations will show the same feedback.\n\n**How it works:**\n1. Feedback is always stored on the original message (regeneration_index = 0)\n2. When viewing any regenerated version, it displays the original message's feedback\n3. All versions show the same feedback in their response\n4. The versions array remains unchanged - only the feedback field is updated"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/messages/{{message_id}}/feedback",
+              "host": ["{{baseUrl}}"],
+              "path": ["messages", "{{message_id}}", "feedback"]
+            },
+            "description": "Remove your feedback from a message. Can only remove your own feedback.\n\n**Important:** Since feedback is shared across all regenerations, removing feedback from any version will remove it from all regenerated versions of that response."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000/api/v1"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": "2",
+      "description": "User ID for admin operations (change this to target different users)"
+    },
+    {
+      "key": "role_name",
+      "value": "user",
+      "description": "Role name for role management. Available: 'admin', 'user'"
+    },
+    {
+      "key": "conversation_id",
+      "value": "1",
+      "description": "Conversation ID for testing conversation endpoints"
+    },
+    {
+      "key": "message_id",
+      "value": "1",
+      "description": "Message ID for testing message feedback and regeneration"
+    }
+  ]
+}

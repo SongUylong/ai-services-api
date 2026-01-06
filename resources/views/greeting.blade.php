@@ -1,0 +1,4 @@
+<div>
+    <p>Welcome, {{ $name     }}</p>
+</div>
+
